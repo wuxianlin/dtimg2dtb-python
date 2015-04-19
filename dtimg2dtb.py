@@ -15,19 +15,18 @@
 # limitations under the License.
 #
 # Extract dtb from dt.img
-from re import finditer
 from sys import argv, exc_info
-import struct
+import struct,shutil,os
 
 __NAME__ = "dtimg2dtb"
-__VERSION__ = "1.0"
+__VERSION__ = "1.1"
 
 def usage():
-    print "Usage: %s [dt_image] " % __NAME__
+    print "Usage: %s [dt_image] [path]" % __NAME__
 
 def carvedt(dt_file, offset, size, name):
 
-    print "offset:%#08x size:%#08x" %(offset,size)
+    #print "offset:%#08x size:%#08x" %(offset,size)
     print "Carving to: \'%s\'" % name
 
     try:
@@ -42,7 +41,7 @@ def carvedt(dt_file, offset, size, name):
 
     return 0
 
-def processDt(dt_image_name):
+def processDt(dt_image_name,path):
 
     rtn = 0
 
@@ -82,7 +81,7 @@ def processDt(dt_image_name):
 		    pmic3=struct.unpack('i', f.read(4))[0]
 		offset=struct.unpack('i', f.read(4))[0]
 		size=struct.unpack('i', f.read(4))[0]
-		name='dtb'+str(len(dt))
+		name=os.path.join(path+'/'+str(len(dt))+'.dtb')
 		dtbexist=0
 		for i in range(0,len(dt)):
 		    if dt[i][0]==offset:
@@ -99,7 +98,18 @@ def processDt(dt_image_name):
 		    print "%#08x    %#08x    %#08x    %#08x    %#08x    %s" %(platform_id,variant_id,soc_rev,offset,size,name)
             #print dt
             for i in range(0,len(dt)):
-		#print "%#08x %#08x %s" %(dt[i][0],dt[i][1],dt[i][2])
+		print "offset:%#08x size:%#08x" %(dt[i][0],dt[i][1])
+		if version>2:
+		    f.seek(dt[i][0]+0x7c)
+		    info1=f.read(0x28)
+		    f.seek(dt[i][0]+0xb4)
+		    info2=f.read(0x28)
+		else:
+		    f.seek(dt[i][0]+0x6c)
+		    info1=f.read(0x28)
+		    f.seek(dt[i][0]+0xa0)
+		    info2=f.read(0x28)
+		print "model:%s \ncompatible:%s" %(info1,info2)
 		carvedt(f,dt[i][0],dt[i][1],dt[i][2])
         finally:
             f.close()
@@ -111,11 +121,14 @@ def processDt(dt_image_name):
 
     return rtn
 
-def main(arg):
+def main(image,path):
     
     rtn = 0
-
-    rtn = processDt(arg)
+    if os.access(path, os.F_OK | os.X_OK) is True:
+        shutil.rmtree(path)
+    os.mkdir(path)
+    if os.access(path, os.F_OK | os.X_OK) is True:
+        rtn = processDt(image,path)
 
     return rtn
 
@@ -124,5 +137,8 @@ if __name__ == "__main__":
     if len(argv) < 2:
         print "[Error] You must specify dt image file."
         exit(usage())
-
-    exit(main(argv[1]))
+    if len(argv) > 2:
+        path=argv[2]
+    else:
+        path=argv[1]+"-dtb"
+    exit(main(argv[1],path))
