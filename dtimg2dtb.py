@@ -15,6 +15,7 @@
 # limitations under the License.
 #
 # Extract dtb from dt.img
+from re import finditer
 from sys import argv, exc_info
 import struct,shutil,os
 
@@ -98,17 +99,55 @@ def processDt(dt_image_name,path):
 		    print "%#08x    %#08x    %#08x    %#08x    %#08x    %s" %(platform_id,variant_id,soc_rev,offset,size,name)
             #print dt
             for i in range(0,len(dt)):
-		print "offset:%#08x size:%#08x" %(dt[i][0],dt[i][1])
+		print "\noffset:%#08x size:%#08x" %(dt[i][0],dt[i][1])
 		if version>2:
-		    f.seek(dt[i][0]+0x7c)
-		    info1=f.read(0x28)
-		    f.seek(dt[i][0]+0xb4)
-		    info2=f.read(0x28)
+		    info_offset1=dt[i][0]+0x7c
+		    f.seek(info_offset1)
+		    info=f.read()
+		    hits = [m.start() for m in finditer(chr(0x00)*3+chr(0x32), info)]
+		    #print hits[0]
+		    if len(hits)>0 and hits[0]<0x70:
+		        #print '%#x' %hits[0]
+		        hits0=hits[0]+4
+		    else :
+		        hits0=0x34
+		    f.seek(info_offset1)
+		    info1=f.read(hits0-10)
+		    info_offset2=info_offset1+hits0
+		    f.seek(info_offset2)
+		    info=f.read()
+		    hits = [m.start() for m in finditer(chr(0x00)*3+chr(0x18), info)]
+		    if len(hits)>0 and hits[0]<0x70:
+		        #print '%#x' %hits[0]
+		        hits0=hits[0]+4
+		    else :
+		        hits0=0x34
+		    f.seek(info_offset2)
+		    info2=f.read(hits0-8)
 		else:
-		    f.seek(dt[i][0]+0x6c)
-		    info1=f.read(0x28)
-		    f.seek(dt[i][0]+0xa0)
-		    info2=f.read(0x28)
+		    info_offset1=dt[i][0]+0x6c
+		    f.seek(info_offset1)
+		    info=f.read()
+		    hits = [m.start() for m in finditer(chr(0x00)*3+chr(0x21), info)]
+		    #print hits[0]
+		    if len(hits)>0 and hits[0]<0x70:
+		        #print '%#x' %hits[0]
+		        hits0=hits[0]+4
+		    else :
+		        hits0=0x34
+		    f.seek(info_offset1)
+		    info1=f.read(hits0-10)
+		    info_offset2=info_offset1+hits0
+		    f.seek(info_offset2)
+		    info=f.read()
+		    hits = [m.start() for m in finditer(chr(0x00)*3+chr(0x2c), info)]
+		    if len(hits)>0 and hits[0]<0x70:
+		        #print '%#x' %hits[0]
+		        hits0=hits[0]+4
+		    else :
+		        hits0=0x34
+		    f.seek(info_offset2)
+		    info2=f.read(hits0-10)
 		print "model:%s \ncompatible:%s" %(info1,info2)
 		carvedt(f,dt[i][0],dt[i][1],dt[i][2])
         finally:
