@@ -3,7 +3,7 @@ Extract dtb files from dt image
 
 usage:
 ---------
-     python dtimg2dtb.py [dt_image_file] [dtb_path]
+     python dtimg2dtb.py <input_dt_image> <output_dtb_path>
 
 example:
 ---------
