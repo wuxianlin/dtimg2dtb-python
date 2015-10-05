@@ -60,21 +60,21 @@ def processDt(dt_image_name,path):
             print "dt version:%s" % version
             print "dtb nums:%s" % num
             if version==3:
-                print "platform_id variant_id  subtype_id  soc_rev     pmic0       pmic1       pmic2       pmic3       offset      size      filename"
+                print "chipset platform subtype    rev      pmic0   pmic1   pmic2   pmic3   offset      size      filename"
             elif version==2:
-                print "platform_id variant_id  subtype_id  soc_rev     offset      size      filename"
+                print "chipset platform subtype    rev        offset      size      filename"
             elif version==1:
-                print "platform_id variant_id  soc_rev     offset      size      filename"
+                print "chipset platform    rev        offset      size      filename"
             else :
                 print "not support your dt version"
                 exit(1)
             dt= []
             for i in range(0,num):
-		platform_id=struct.unpack('i', f.read(4))[0]
-		variant_id=struct.unpack('i', f.read(4))[0]
+		chipset=struct.unpack('i', f.read(4))[0]
+		platform=struct.unpack('i', f.read(4))[0]
 		if version>1:
-		    subtype_id=struct.unpack('i', f.read(4))[0]
-		soc_rev=struct.unpack('i', f.read(4))[0]
+		    subtype=struct.unpack('i', f.read(4))[0]
+		rev=struct.unpack('i', f.read(4))[0]
 		if version>2:
 		    pmic0=struct.unpack('i', f.read(4))[0]
 		    pmic1=struct.unpack('i', f.read(4))[0]
@@ -92,11 +92,11 @@ def processDt(dt_image_name,path):
 		if dtbexist==0:
 		    dt.append([offset,size,name])
 		if version==3:
-		    print "%#08x    %#08x    %#08x    %#08x    %#08x    %#08x    %#08x    %#08x    %#08x    %#08x    %s" %(platform_id,variant_id,subtype_id,soc_rev,pmic0,pmic1,pmic2,pmic3,offset,size,name)
+		    print "%#4d    %#4d    %#4d    %#8d    %#4d    %#4d    %#4d    %#4d    %#08x    %#08x    %s" %(chipset,platform,subtype,rev,pmic0,pmic1,pmic2,pmic3,offset,size,name)
 		elif version==2:
-		    print "%#08x    %#08x    %#08x    %#08x    %#08x    %#08x    %s" %(platform_id,variant_id,subtype_id,soc_rev,offset,size,name)
+		    print "%#4d    %#4d    %#4d    %#8d    %#08x    %#08x    %s" %(chipset,platform,subtype,rev,offset,size,name)
                 elif version==1:
-		    print "%#08x    %#08x    %#08x    %#08x    %#08x    %s" %(platform_id,variant_id,soc_rev,offset,size,name)
+		    print "%#4d    %#4d    %#8d    %#08x    %#08x    %s" %(chipset,platform,rev,offset,size,name)
             #print dt
             for i in range(0,len(dt)):
 		print "\noffset:%#08x size:%#08x" %(dt[i][0],dt[i][1])
