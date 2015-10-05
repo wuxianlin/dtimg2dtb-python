@@ -11,13 +11,14 @@ usage:
        --dt-tag/-d          alternate QCDT_DT_TAG
        --verbose/-v         verbose
        --force-v2/-2        use dtb v2 format
+       --force-v3/-3        use dtb v3 format
        --help/-h            this help screen
 
 example:
 ---------
-     ./dtbToolCM -2 -o dtb.img -s 2048 -p dtc/ dtb/
+     ./dtbToolOppo -3 -o dtb.img -s 2048 -p dtc/ dtb/
 
 Source:
 ---------
 [dtbTool](https://www.codeaurora.org/cgit/quic/la/device/qcom/common/)<br /> 
-[dtbToolCM](https://github.com/CyanogenMod/android_device_qcom_common)<br /> 
+[dtbToolOppo](https://github.com/CyanogenMod/android_device_oppo_msm8939-common)<br /> 

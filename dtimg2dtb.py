@@ -60,9 +60,9 @@ def processDt(dt_image_name,path):
             print "dt version:%s" % version
             print "dtb nums:%s" % num
             if version==3:
-                print "chipset platform subtype    rev      pmic0   pmic1   pmic2   pmic3   offset      size      filename"
+                print "chipset platform subtype     rev    oppoId    pmic0   pmic1   pmic2   pmic3   offset      size      filename"
             elif version==2:
-                print "chipset platform subtype    rev        offset      size      filename"
+                print "chipset platform subtype     rev    oppoId      offset      size      filename"
             elif version==1:
                 print "chipset platform    rev        offset      size      filename"
             else :
@@ -75,6 +75,8 @@ def processDt(dt_image_name,path):
 		if version>1:
 		    subtype=struct.unpack('i', f.read(4))[0]
 		rev=struct.unpack('i', f.read(4))[0]
+		if version>1:
+		    oppoId=struct.unpack('i', f.read(4))[0]
 		if version>2:
 		    pmic0=struct.unpack('i', f.read(4))[0]
 		    pmic1=struct.unpack('i', f.read(4))[0]
@@ -92,9 +94,9 @@ def processDt(dt_image_name,path):
 		if dtbexist==0:
 		    dt.append([offset,size,name])
 		if version==3:
-		    print "%#4d    %#4d    %#4d    %#8d    %#4d    %#4d    %#4d    %#4d    %#08x    %#08x    %s" %(chipset,platform,subtype,rev,pmic0,pmic1,pmic2,pmic3,offset,size,name)
+		    print "%#4d    %#4d    %#4d    %#8d    %#4d    %#4d    %#4d    %#4d    %#4d    %#08x    %#08x    %s" %(chipset,platform,subtype,rev,oppoId,pmic0,pmic1,pmic2,pmic3,offset,size,name)
 		elif version==2:
-		    print "%#4d    %#4d    %#4d    %#8d    %#08x    %#08x    %s" %(chipset,platform,subtype,rev,offset,size,name)
+		    print "%#4d    %#4d    %#4d    %#8d    %#4d    %#08x    %#08x    %s" %(chipset,platform,subtype,rev,oppoId,offset,size,name)
                 elif version==1:
 		    print "%#4d    %#4d    %#8d    %#08x    %#08x    %s" %(chipset,platform,rev,offset,size,name)
             #print dt
